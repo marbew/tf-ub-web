@@ -31,7 +31,7 @@
       service:
         name: apache2
         state: started
-        enabled: yes
+        enabled: yesls -la
 
     - name: Install Httpd on Amazon
       service:
