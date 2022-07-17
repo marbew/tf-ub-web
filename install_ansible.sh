@@ -1,3 +1,5 @@
+#!/bin/bash
+
 sudo apt-get update
 sudo apt install ansible -y
 git clone https://github.com/marbew/tf-ub-web.git
