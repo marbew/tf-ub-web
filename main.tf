@@ -31,24 +31,33 @@ resource "aws_instance" "tf-ubuntu" {
   ami           = "ami-0fb391cce7a602d1f"
   instance_type = "t2.micro"
   key_name = aws_key_pair.kp.key_name
-  security_groups = ["tf-sg-ubuntu_ssh"]
-  user_data = file("install_ansible.sh")
+  security_groups = ["ssh_web"]
+
+  user_data = <<-EOF
+  #!/bin/bash
+  sudo su - root
+  apt update && apt install ansible -y
+  git clone https://github.com/marbew/tf-ub-web.git && cd tf-ub-web
+  mkdir /etc/ansible && touch ansible.cfg hosts
+  sed -i '/^#inventory.*  /s/^#//' /etc/ansible/ansible.cfg
+  echo "localhost ansible_connection=local" >> /etc/ansbile/hosts
+  ansible-playbook apache.yml 
+  EOF
 
   tags = {
     Name = "tf-ubuntu"
   }
 }
 
-resource "aws_security_group" "tf-ubuntu_sg_ssh" {
-  name = "tf-sg-ubuntu_ssh"
+resource "aws_security_group" "ssh_web" {
+  name = "ssh_web"
 
   #Incoming traffic
   ingress {
     from_port = 22
     to_port   = 22
     protocol  = "tcp"
-    #cidr_blocks = ["35.158.102.17/32"] #replace it with your ip address
-    cidr_blocks = ["0.0.0.0/0"] #replace it with your ip address
+    cidr_blocks = ["0.0.0.0/0"] #replace it with your ip address ["35.158.102.17/32"]
   }
 
   #Outgoing traffic
@@ -58,10 +67,7 @@ resource "aws_security_group" "tf-ubuntu_sg_ssh" {
     to_port     = 0
     cidr_blocks = ["0.0.0.0/0"]
   }
-}
 
-resource "aws_security_group" "web-sg" {
-  name = "webserver"
   ingress {
     from_port   = 80
     to_port     = 80
