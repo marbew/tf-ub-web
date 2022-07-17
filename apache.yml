@@ -1,4 +1,4 @@
-- name: Setup Apache2 Server 
+- name: Setup Apache Server 
   hosts: localhost
   become: yes
   tasks:
