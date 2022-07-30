@@ -17,20 +17,20 @@ resource "tls_private_key" "pk" {
 }
 
 resource "aws_key_pair" "kp" {
-  key_name   = "tf-sshkey"   # Create pub key to ec2
-  public_key = tls_private_key.pk.public_key_openssh
+  key_name        = "tf-sshkey"   # Create pub key to ec2
+  public_key      = tls_private_key.pk.public_key_openssh
 }
 
 resource "local_file" "ssh_key" {
-  filename = "${aws_key_pair.kp.key_name}.pem"
-  content = tls_private_key.pk.private_key_pem
+  filename        = "${aws_key_pair.kp.key_name}.pem"
+  content         = tls_private_key.pk.private_key_pem
   file_permission = "0400"
 }
 
 resource "aws_instance" "tf-ubuntu" {
-  ami           = "ami-0fb391cce7a602d1f"
-  instance_type = "t2.micro"
-  key_name = aws_key_pair.kp.key_name
+  ami             = "ami-0fb391cce7a602d1f"
+  instance_type   = "t2.micro"
+  key_name        = aws_key_pair.kp.key_name
   security_groups = ["ssh_web"]
 
   user_data = <<-EOF
@@ -54,10 +54,10 @@ resource "aws_security_group" "ssh_web" {
 
   #Incoming traffic
   ingress {
-    from_port = 22
-    to_port   = 22
-    protocol  = "tcp"
-    cidr_blocks = ["0.0.0.0/0"] #replace it with your ip address ["35.158.102.17/32"]
+    from_port   = 22
+    to_port     = 22
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"] #replace it with your ip address ["1.2.3.4/32"]
   }
 
   #Outgoing traffic
